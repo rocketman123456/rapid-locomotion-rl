@@ -1,6 +1,6 @@
 from isaacgym import gymutil, gymapi
 import torch
-from params_proto.neo_proto import Meta
+from params_proto import Meta
 from typing import Union
 
 from mini_gym.envs.base.legged_robot import LeggedRobot
@@ -34,16 +34,18 @@ class VelocityTrackingEasyEnv(LeggedRobot):
             cfg.commands.ranges.heading = [0, 0]
             cfg.commands.heading_command = False
 
+        cfg_sim = vars(cfg.sim)
+        cfg_sim['physx'] = vars(cfg_sim['physx'])
         sim_params = gymapi.SimParams()
-        gymutil.parse_sim_config(vars(cfg.sim), sim_params)
+        gymutil.parse_sim_config(cfg_sim, sim_params)
+        # gymutil.parse_sim_config(vars(cfg.sim), sim_params)
         super().__init__(cfg, sim_params, physics_engine, sim_device, headless, eval_cfg, initial_dynamics_dict)
-
 
     def step(self, actions):
         self.obs_buf, self.privileged_obs_buf, self.rew_buf, self.reset_buf, self.extras = super().step(actions)
 
         self.foot_positions = self.rigid_body_state.view(self.num_envs, self.num_bodies, 13)[:, self.feet_indices,
-                               0:3]
+                                                                                             0:3]
 
         self.extras.update({
             "privileged_obs": self.privileged_obs_buf,
@@ -67,4 +69,3 @@ class VelocityTrackingEasyEnv(LeggedRobot):
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
         obs, _, _, _ = self.step(torch.zeros(self.num_envs, self.num_actions, device=self.device, requires_grad=False))
         return obs
-

@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
-from params_proto.neo_proto import PrefixProto
+from params_proto import PrefixProto
 
 from mini_gym_learn.ppo import ActorCritic
 from mini_gym_learn.ppo import RolloutStorage
@@ -97,7 +97,7 @@ class PPO:
         mean_adaptation_module_loss = 0
         generator = self.storage.mini_batch_generator(PPO_Args.num_mini_batches, PPO_Args.num_learning_epochs)
         for obs_batch, critic_obs_batch, privileged_obs_batch, obs_history_batch, actions_batch, target_values_batch, advantages_batch, returns_batch, old_actions_log_prob_batch, \
-            old_mu_batch, old_sigma_batch, masks_batch, env_bins_batch in generator:
+                old_mu_batch, old_sigma_batch, masks_batch, env_bins_batch in generator:
 
             self.actor_critic.act(obs_batch, privileged_obs_batch, masks=masks_batch)
             actions_log_prob_batch = self.actor_critic.get_actions_log_prob(actions_batch)
@@ -111,8 +111,8 @@ class PPO:
                 with torch.inference_mode():
                     kl = torch.sum(
                         torch.log(sigma_batch / old_sigma_batch + 1.e-5) + (
-                                torch.square(old_sigma_batch) + torch.square(old_mu_batch - mu_batch)) / (
-                                2.0 * torch.square(sigma_batch)) - 0.5, axis=-1)
+                            torch.square(old_sigma_batch) + torch.square(old_mu_batch - mu_batch)) / (
+                            2.0 * torch.square(sigma_batch)) - 0.5, axis=-1)
                     kl_mean = torch.mean(kl)
 
                     if kl_mean > PPO_Args.desired_kl * 2.0:
@@ -133,8 +133,8 @@ class PPO:
             # Value function loss
             if PPO_Args.use_clipped_value_loss:
                 value_clipped = target_values_batch + \
-                                (value_batch - target_values_batch).clamp(-PPO_Args.clip_param,
-                                                                          PPO_Args.clip_param)
+                    (value_batch - target_values_batch).clamp(-PPO_Args.clip_param,
+                                                              PPO_Args.clip_param)
                 value_losses = (value_batch - returns_batch).pow(2)
                 value_losses_clipped = (value_clipped - returns_batch).pow(2)
                 value_loss = torch.max(value_losses, value_losses_clipped).mean()

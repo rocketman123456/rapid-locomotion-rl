@@ -9,9 +9,10 @@ setup(
     packages=find_packages(),
     author_email='gmargo@mit.edu',
     description='Isaac Gym environments for Legged Robots. Built on legged_gym by Nikita Rudin, ETH Zurich, NVIDIA',
-    install_requires=[#'isaacgym',
-                      'matplotlib',
-                      'gym',
-                      'ml_logger',
-                      ]
+    install_requires=[
+        # 'isaacgym',
+        'matplotlib',
+        'gym',
+        'ml_logger',
+    ]
 )

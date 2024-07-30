@@ -1,6 +1,6 @@
 # License: see [LICENSE, LICENSES/legged_gym/LICENSE]
 
-from params_proto.neo_proto import PrefixProto, ParamsProto
+from params_proto import PrefixProto, ParamsProto
 
 
 class Cfg(PrefixProto, cli=False):
@@ -11,7 +11,7 @@ class Cfg(PrefixProto, cli=False):
         privileged_future_horizon = 1
         num_actions = 12
         num_observation_history = 15
-        env_spacing = 3.  # not used with heightfields/trimeshes 
+        env_spacing = 3.  # not used with heightfields/trimeshes
         send_timeouts = True  # send time out information to the algorithm
         episode_length_s = 20  # episode length in seconds
         observe_vel = True
