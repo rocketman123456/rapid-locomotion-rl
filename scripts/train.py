@@ -21,8 +21,9 @@ def train_mc(headless=True):
     env = VelocityTrackingEasyEnv(sim_device='cuda:0', headless=False, cfg=Cfg)
 
     # log the experiment parameters
-    logger.log_params(AC_Args=vars(AC_Args), PPO_Args=vars(PPO_Args), RunnerArgs=vars(RunnerArgs),
-                      Cfg=vars(Cfg))
+    logger.log_params(
+        AC_Args=vars(AC_Args), PPO_Args=vars(PPO_Args), RunnerArgs=vars(RunnerArgs), Cfg=vars(Cfg)
+    )
 
     env = HistoryWrapper(env)
     gpu_id = 0

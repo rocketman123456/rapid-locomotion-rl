@@ -97,16 +97,21 @@ class Runner:
         logger.start('start', 'epoch', 'episode', 'run', 'step')
 
         if init_at_random_ep_len:
-            self.env.episode_length_buf = torch.randint_like(self.env.episode_length_buf,
-                                                             high=int(self.env.max_episode_length))
+            self.env.episode_length_buf = torch.randint_like(
+                self.env.episode_length_buf,
+                high=int(self.env.max_episode_length)
+            )
 
         # split train and test envs
         num_train_envs = self.env.num_train_envs
 
         obs_dict = self.env.get_observations()
         obs, privileged_obs, obs_history = obs_dict["obs"], obs_dict["privileged_obs"], obs_dict["obs_history"]
-        obs, privileged_obs, obs_history = obs.to(self.device), privileged_obs.to(self.device), obs_history.to(
-            self.device)
+        obs, privileged_obs, obs_history = (
+            obs.to(self.device),
+            privileged_obs.to(self.device),
+            obs_history.to(self.device)
+        )
         self.alg.actor_critic.train()
 
         rewbuffer = deque(maxlen=100)
@@ -125,14 +130,21 @@ class Runner:
             # Rollout
             with torch.inference_mode():
                 for i in range(self.num_steps_per_env):
-                    actions_train = self.alg.act(obs[:num_train_envs], privileged_obs[:num_train_envs],
-                                                 obs_history[:num_train_envs])
+                    actions_train = self.alg.act(
+                        obs[:num_train_envs],
+                        privileged_obs[:num_train_envs],
+                        obs_history[:num_train_envs]
+                    )
                     if eval_expert:
-                        actions_eval = self.alg.actor_critic.act_teacher(obs[num_train_envs:],
-                                                                         privileged_obs[num_train_envs:])
+                        actions_eval = self.alg.actor_critic.act_teacher(
+                            obs[num_train_envs:],
+                            privileged_obs[num_train_envs:]
+                        )
                     else:
-                        actions_eval = self.alg.actor_critic.act_student(obs[num_train_envs:],
-                                                                         obs_history[num_train_envs:])
+                        actions_eval = self.alg.actor_critic.act_student(
+                            obs[num_train_envs:],
+                            obs_history[num_train_envs:]
+                        )
                     ret = self.env.step(torch.cat((actions_train, actions_eval), dim=0))
                     obs_dict, rewards, dones, infos = ret
                     obs, privileged_obs, obs_history = obs_dict["obs"], obs_dict["privileged_obs"], obs_dict[
